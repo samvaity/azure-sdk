@@ -188,7 +188,7 @@ jobs:
     parameters:
       BaseBranchName: $(DefaultBranch)
       RepoOwner: dotnet
-      PROwner: Azure
+      PROwner: dotnet
       RepoName: docs
       PRBranchName: PackageIndexUpdates
       CommitMsg: "Update package index with latest published versions"
