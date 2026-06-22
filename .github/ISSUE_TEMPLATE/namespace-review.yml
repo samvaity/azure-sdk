@@ -20,8 +20,8 @@ body:
       label: Plane Type
       description: "Select whether this is a data plane or management plane library."
       options:
-        - Data Plane
         - Management Plane
+        - Data Plane
     validations:
       required: true
 
@@ -108,7 +108,7 @@ body:
         - **.NET:** `Azure.ResourceManager.[ResourceProviderName]`
         - **Java:** `azure-resourcemanager-[resourceprovidername]`
         - **Go:** `sdk/resourcemanager/[resourceprovidername]/arm[resourceprovidername]`
-        - **JavaScript:** `@azure/arm-[resourceprovidername]`
+        - **JavaScript:** `@azure/arm-[resource-provider-name]`
         - **Python:** `azure-mgmt-[resourceprovidername]`
 
         **Data Plane conventions:**
