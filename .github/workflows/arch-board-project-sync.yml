@@ -1,0 +1,41 @@
+name: "Arch Board Project Sync"
+
+on:
+  issues:
+    types: [opened, edited, reopened, closed, labeled, unlabeled, assigned, unassigned]
+
+# Auto-add board-review issues to the Project board and keep the Status column
+# in sync with issue labels/state. Built-in project workflows are UI-only, so
+# this reproduces auto-add + status mapping in a version-controlled way.
+jobs:
+  sync:
+    if: contains(github.event.issue.labels.*.name, 'board-review')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout workflow dependencies
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund --prefer-offline
+        working-directory: ./.github
+
+      - name: Sync issue to project board
+        uses: actions/github-script@v9
+        env:
+          # Personal fork test board. For upstream, set to Azure org project
+          # and PROJECT_SCOPE: organization.
+          PROJECT_OWNER: samvaity
+          PROJECT_NUMBER: "3"
+          PROJECT_SCOPE: user
+        with:
+          # Requires a token with the `project` scope; the default GITHUB_TOKEN
+          # cannot write to user/org projects.
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const { default: syncProject } = await import('${{ github.workspace }}/.github/workflows/src/arch-board-review/project-sync.js');
+            await syncProject({ github, context, core });
