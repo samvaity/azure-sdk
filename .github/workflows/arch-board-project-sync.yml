@@ -2,7 +2,7 @@ name: "Arch Board Project Sync"
 
 on:
   issues:
-    types: [opened, edited, reopened, closed, labeled, unlabeled, assigned, unassigned]
+    types: [opened, edited, reopened, closed, labeled, unlabeled]
 
 # Auto-add board-review issues to the Project board and keep the Status column
 # in sync with issue labels/state. Built-in project workflows are UI-only, so

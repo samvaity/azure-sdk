@@ -23,6 +23,19 @@ const APPROVAL_LABEL_PATTERN = /-api-approved$/;
 /**
  * Resolves the target board Status option name from the issue's labels/state.
  */
+/**
+ * Resolves the target board Status option name from the issue's labels/state.
+ *
+ * Purely label-driven, faithful to ARCH-BOARD-REVIEW-PROCESS.md:
+ *   - closed (all languages approved)            -> Approved
+ *   - some but not all <lang>-api-approved        -> In Review
+ *   - ready-for-review (no approvals yet)         -> Ready for Review
+ *   - needs-info                                  -> Changes Requested
+ *   - otherwise (new, pre-triage)                 -> Incoming
+ *
+ * Note: assignees are intentionally NOT used; the documented process is driven
+ * entirely by labels applied by the triage bot and architects.
+ */
 function resolveStatus(issue) {
   const labels = (issue.labels || []).map((label) =>
     typeof label === "string" ? label : label.name,
@@ -32,9 +45,6 @@ function resolveStatus(issue) {
     return "Approved";
   }
   if (labels.some((label) => APPROVAL_LABEL_PATTERN.test(label ?? ""))) {
-    return "In Review";
-  }
-  if (Array.isArray(issue.assignees) && issue.assignees.length > 0) {
     return "In Review";
   }
   if (labels.includes("needs-info")) {
