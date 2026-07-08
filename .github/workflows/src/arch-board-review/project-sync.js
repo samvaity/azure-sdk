@@ -14,24 +14,28 @@
  *   - PROJECT_SCOPE: "user" or "organization" (defaults to "user")
  *
  * Requires a token with the `project` scope (the default GITHUB_TOKEN cannot
- * write to user/org projects), provided via the PROJECTS_TOKEN secret.
+ * write to user/org projects), provided via the PROJECT_TOKEN secret.
  */
+
+import { LANGUAGE_DEFINITIONS } from "./issue-parsing.js";
 
 const STATUS_FIELD_NAME = "Status";
 const APPROVAL_LABEL_PATTERN = /-api-approved$/;
 
 /**
  * Resolves the target board Status option name from the issue's labels/state.
- */
-/**
- * Resolves the target board Status option name from the issue's labels/state.
  *
  * Purely label-driven, faithful to ARCH-BOARD-REVIEW-PROCESS.md:
- *   - closed (all languages approved)            -> Approved
- *   - some but not all <lang>-api-approved        -> In Review
- *   - ready-for-review (no approvals yet)         -> Ready for Review
- *   - needs-info                                  -> Changes Requested
- *   - otherwise (new, pre-triage)                 -> Incoming
+ *   - closed OR all selected languages approved   -> Approved
+ *   - some but not all <lang>-api-approved         -> In Review
+ *   - ready-for-review (no approvals yet)          -> Ready for Review
+ *   - needs-info                                   -> Changes Requested
+ *   - otherwise (new, pre-triage)                  -> Incoming
+ *
+ * "All approved" is checked independently of the closed state because the
+ * auto-close in approval-close.yml runs under the default GITHUB_TOKEN, and
+ * GitHub does not fire workflow-triggering events for GITHUB_TOKEN actions.
+ * Relying only on the `closed` event would leave the card stuck at In Review.
  *
  * Note: assignees are intentionally NOT used; the documented process is driven
  * entirely by labels applied by the triage bot and architects.
@@ -41,7 +45,14 @@ function resolveStatus(issue) {
     typeof label === "string" ? label : label.name,
   );
 
-  if (issue.state === "closed") {
+  const selectedLanguages = LANGUAGE_DEFINITIONS.filter((language) =>
+    labels.includes(language.label),
+  );
+  const allLanguagesApproved =
+    selectedLanguages.length > 0 &&
+    selectedLanguages.every((language) => labels.includes(`${language.id}-api-approved`));
+
+  if (issue.state === "closed" || allLanguagesApproved) {
     return "Approved";
   }
   if (labels.some((label) => APPROVAL_LABEL_PATTERN.test(label ?? ""))) {
