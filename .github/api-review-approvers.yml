@@ -1,4 +1,4 @@
-# cspell:words jsquire alzimmermsft xirzec kashifkhan maorleger jhendrixMSFT ArthurMa1978
+# cspell:words jsquire alzimmermsft xirzec kashifkhan maorleger jhendrixMSFT ArthurMa1978 samvaity
 # API Review Approvers Configuration
 # This file defines who can approve API reviews per language.
 # Used by the approval-close.yml workflow to validate approval labels.
@@ -8,19 +8,29 @@ data-plane:
   dotnet:
     - jsquire
     - m-nash
+    - samvaity
   java:
     - JonathanGiles
     - alzimmermsft
+    - samvaity
   python:
     - xirzec
     - kashifkhan
+    - samvaity
   typescript:
     - xirzec
     - maorleger
+    - samvaity
   go:
     - jhendrixMSFT
+    - samvaity
+  cpp:
+    - samvaity
+  rust:
+    - samvaity
 
 management-plane:
   all:
     - ArthurMa1978
     - m-nash
+    - samvaity
